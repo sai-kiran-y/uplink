@@ -21,3 +21,6 @@ uplink_port=5555
 tags=["sshd", "systemd"]
 stream_size=1
 min_level=7
+
+[net]
+git-fetch-with-cli = true
