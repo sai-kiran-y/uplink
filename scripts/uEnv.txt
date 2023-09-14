@@ -52,7 +52,7 @@ enable_uboot_cape_universal=1
 #uboot_fdt_buffer=0x60000
 ###U-Boot Overlays###
 
-### BOOT SWITCH LOGIC START
+### ROOT SWITCH LOGIC START
 ### Do not put semicolon while assign to a variable
 findroot=\
 	if test -e mmc 0:1 two; then \
@@ -83,7 +83,7 @@ findroot=\
 	
 uenvcmd=run findroot;
 
-### BOOT SWITCH LOGIC END 
+### ROOT SWITCH LOGIC END 
 
 
 cmdline=coherent_pool=1M net.ifnames=0 lpj=1990656 rng_core.default_quality=100 quiet

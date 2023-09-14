@@ -4,7 +4,7 @@ fdt_file=/kernels/bcm2710-rpi-3-b-plus.dtb
 # By default, the partition 2 is the rootfs.
 root_part=/dev/mmcblk0p2
 
-# BOOT SWITCH LOGIC START
+# ROOT SWITCH LOGIC START
 if test -e mmc 0 two; then
 	echo file two found;
 	if test -e mmc 0 two_ok; then
@@ -41,7 +41,7 @@ elif test -e mmc 0 three; then
 		root_part=/dev/mmcblk0p2;
 	fi;
 fi;
-# BOOT SWITCH LOGIC END 
+# ROOT SWITCH LOGIC END 
 
 if test -e mmc 0:1  init; then	
 	echo checking for init
