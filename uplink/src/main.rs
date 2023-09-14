@@ -6,11 +6,8 @@ use std::time::Duration;
 
 use anyhow::Error;
 use log::info;
-use signal_hook::consts::{SIGINT, SIGQUIT, SIGTERM};
-use signal_hook_tokio::Signals;
 use structopt::StructOpt;
 use tokio::time::sleep;
-use tokio_stream::StreamExt;
 use tracing::error;
 use tracing_subscriber::fmt::format::{Format, Pretty};
 use tracing_subscriber::{fmt::Layer, layer::Layered, reload::Handle};
@@ -92,7 +89,8 @@ fn banner(commandline: &CommandLine, config: &Arc<Config>) {
 
     println!(
         "    downloader:\n\tpath: {}\n\tactions: {:?}",
-        config.downloader.path, config.downloader.actions
+        config.downloader.path.display(),
+        config.downloader.actions
     );
     if let Some(installer) = &config.ota_installer {
         println!("    installer:\n\tpath: {}\n\tactions: {:?}", installer.path, installer.actions);
@@ -121,19 +119,33 @@ fn main() -> Result<(), Error> {
     banner(&commandline, &config);
 
     let mut uplink = Uplink::new(config.clone())?;
-    let bridge = uplink.spawn()?;
+    let mut bridge = uplink.configure_bridge();
+    uplink.spawn_builtins(&mut bridge)?;
+
+    let bridge_tx = bridge.tx();
+
+    let mut tcpapps = vec![];
+    for (app, cfg) in config.tcpapps.clone() {
+        let actions_rx = bridge.register_action_routes(&cfg.actions);
+        tcpapps.push(TcpJson::new(app, cfg, actions_rx, bridge.tx()));
+    }
+
+    let simulator_actions =
+        config.simulator.as_ref().and_then(|cfg| bridge.register_action_routes(&cfg.actions));
+
+    uplink.spawn(bridge)?;
 
     if let Some(config) = config.simulator.clone() {
-        let bridge = bridge.clone();
+        let bridge_tx = bridge_tx.clone();
         thread::spawn(move || {
-            simulator::start(bridge, &config).unwrap();
+            simulator::start(config, bridge_tx, simulator_actions).unwrap();
         });
     }
 
     if config.console.enabled {
         let port = config.console.port;
-        let bridge_handle = bridge.clone();
-        thread::spawn(move || console::start(port, reload_handle, bridge_handle));
+        let bridge_tx = bridge_tx.clone();
+        thread::spawn(move || console::start(port, reload_handle, bridge_tx));
     }
 
     let rt = tokio::runtime::Builder::new_current_thread()
@@ -144,22 +156,25 @@ fn main() -> Result<(), Error> {
         .unwrap();
 
     rt.block_on(async {
-        for (app, cfg) in config.tcpapps.iter() {
-            let tcpjson = TcpJson::new(app.to_owned(), cfg.clone(), bridge.clone()).await;
+        for app in tcpapps {
             tokio::task::spawn(async move {
-                if let Err(e) = tcpjson.start().await {
+                if let Err(e) = app.start().await {
                     error!("App failed. Error = {:?}", e);
                 }
             });
         }
 
-        let mut signals = Signals::new([SIGTERM, SIGINT, SIGQUIT]).unwrap();
-
+        #[cfg(unix)]
         tokio::spawn(async move {
+            use signal_hook::consts::{SIGINT, SIGQUIT, SIGTERM};
+            use signal_hook_tokio::Signals;
+            use tokio_stream::StreamExt;
+
+            let mut signals = Signals::new([SIGTERM, SIGINT, SIGQUIT]).unwrap();
             // Handle a shutdown signal from POSIX
             while let Some(signal) = signals.next().await {
                 match signal {
-                    SIGTERM | SIGINT | SIGQUIT => bridge.trigger_shutdown().await,
+                    SIGTERM | SIGINT | SIGQUIT => bridge_tx.trigger_shutdown().await,
                     s => error!("Couldn't handle signal: {s}"),
                 }
             }

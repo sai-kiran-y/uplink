@@ -1,12 +1,13 @@
+use std::env::current_dir;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{collections::HashMap, fmt::Debug};
 
 use serde::{Deserialize, Serialize};
 
-#[cfg(any(target_os = "linux"))]
+#[cfg(target_os = "linux")]
 use crate::collector::journalctl::JournalCtlConfig;
-#[cfg(any(target_os = "android"))]
+#[cfg(target_os = "android")]
 use crate::collector::logcat::LogcatConfig;
 
 use self::bridge::stream::MAX_BUFFER_SIZE;
@@ -34,7 +35,23 @@ fn default_file_size() -> usize {
 }
 
 fn default_persistence_path() -> PathBuf {
-    PathBuf::from("/var/lib/uplink")
+    let mut path = current_dir().expect("Couldn't figure out current directory");
+    path.push(".persistence");
+    path
+}
+
+fn default_download_path() -> PathBuf {
+    let mut path = current_dir().expect("Couldn't figure out current directory");
+    path.push(".downloads");
+    path
+}
+
+// Automatically assigns port 5050 for default main app, if left unconfigured
+fn default_tcpapps() -> HashMap<String, AppConfig> {
+    let mut apps = HashMap::new();
+    apps.insert("main".to_string(), AppConfig { port: 5050, actions: vec![] });
+
+    apps
 }
 
 pub fn clock() -> u128 {
@@ -106,21 +123,24 @@ pub struct Stats {
 
 #[derive(Debug, Clone, Deserialize, Default)]
 pub struct SimulatorConfig {
-    /// number of devices to be simulated
-    pub num_devices: u32,
     /// path to directory containing files with gps paths to be used in simulation
     pub gps_paths: String,
     /// actions that are to be routed to simulator
     pub actions: Vec<ActionRoute>,
-    #[serde(skip)]
-    pub actions_subscriptions: Vec<String>,
 }
 
-#[derive(Debug, Clone, Deserialize, Default)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct DownloaderConfig {
-    pub path: String,
+    #[serde(default = "default_download_path")]
+    pub path: PathBuf,
     #[serde(default)]
     pub actions: Vec<ActionRoute>,
+}
+
+impl Default for DownloaderConfig {
+    fn default() -> Self {
+        Self { path: default_download_path(), actions: vec![] }
+    }
 }
 
 #[derive(Debug, Clone, Deserialize, Default)]
@@ -206,11 +226,13 @@ pub struct Config {
     #[serde(default)]
     pub console: ConsoleConfig,
     pub authentication: Option<Authentication>,
-    #[serde(default)]
+    #[serde(default = "default_tcpapps")]
     pub tcpapps: HashMap<String, AppConfig>,
     pub mqtt: MqttConfig,
     #[serde(default)]
     pub processes: Vec<ActionRoute>,
+    #[serde(default)]
+    pub script_runner: Vec<ActionRoute>,
     #[serde(skip)]
     pub actions_subscription: String,
     pub streams: HashMap<String, StreamConfig>,
@@ -220,6 +242,7 @@ pub struct Config {
     pub stream_metrics: StreamMetricsConfig,
     pub serializer_metrics: SerializerMetricsConfig,
     pub mqtt_metrics: MqttMetricsConfig,
+    #[serde(default)]
     pub downloader: DownloaderConfig,
     pub system_stats: Stats,
     pub simulator: Option<SimulatorConfig>,
@@ -230,8 +253,8 @@ pub struct Config {
     pub action_redirections: HashMap<String, String>,
     #[serde(default)]
     pub ignore_actions_if_no_clients: bool,
-    #[cfg(any(target_os = "linux"))]
+    #[cfg(target_os = "linux")]
     pub logging: Option<JournalCtlConfig>,
-    #[cfg(any(target_os = "android"))]
+    #[cfg(target_os = "android")]
     pub logging: Option<LogcatConfig>,
 }
