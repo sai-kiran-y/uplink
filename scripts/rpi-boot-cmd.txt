@@ -1,0 +1,58 @@
+load mmc 0:2 ${kernel_addr_r} /boot/_kernel8.img
+fatload mmc 0:1 ${fdt_addr} bcm2710-rpi-3-b-plus.dtb
+fdt_file=/kernels/bcm2710-rpi-3-b-plus.dtb
+# By default, the partition 2 is the rootfs.
+root_part=/dev/mmcblk0p2
+
+# BOOT SWITCH LOGIC START
+if test -e mmc 0 two; then
+	echo file two found;
+	if test -e mmc 0 two_ok; then
+		echo file two_ok found;
+		load mmc 0:2 ${kernel_addr_r} /boot/_kernel8.img
+		root_part=/dev/mmcblk0p2;
+	elif test ! -e mmc 0 two_failed; then
+		echo two_failed not present;
+		echo creating two_failed;
+		fatwrite mmc 0 ${loadaddr} two_failed 8;
+		load mmc 0:2 ${kernel_addr_r} /boot/_kernel8.img
+		root_part=/dev/mmcblk0p2;
+	else
+		echo two_failed found;
+		load mmc 0:3 ${kernel_addr_r} /boot/_kernel8.img
+		root_part=/dev/mmcblk0p3;
+	fi;	
+
+elif test -e mmc 0 three; then
+	echo file_three found
+	if test -e mmc 0 three_ok; then
+		echo three_ok found;
+		load mmc 0:3 ${kernel_addr_r} /boot/_kernel8.img
+		root_part=/dev/mmcblk0p3;
+	elif test ! -e mmc 0 three_failed; then
+		echo three_failed not present;
+		echo creating three_failed;
+		fatwrite mmc 0 ${loadaddr} three_failed 8;
+		load mmc 0:3 ${kernel_addr_r} /boot/_kernel8.img
+		root_part=/dev/mmcblk0p3;
+	else
+		echo three_failed found;
+		load mmc 0:2 ${kernel_addr_r} /boot/_kernel8.img
+		root_part=/dev/mmcblk0p2;
+	fi;
+fi;
+# BOOT SWITCH LOGIC END 
+
+if test -e mmc 0:1  init; then	
+	echo checking for init
+	setenv bootargs "console=ttyS0,115200 console=tty1 8250.nr_uarts=1 root=${root_part} rootfstype=ext4 fsck.repair=yes rootwait init=/usr/lib/raspberrypi-sys-mods/firstboot systemd.run=/uboot/firstrun.sh systemd.run_success_action=reboot systemd.unit=kernel-command-line.target" 
+elif test -e mmc 0:2 /boot/firstrun.sh; then
+	echo checking for firstrun.sh
+	setenv bootargs "console=ttyS0,115200 console=tty1 8250.nr_uarts=1 root=${root_part} rootfstype=ext4 fsck.repair=yes rootwait systemd.run=/uboot/firstrun.sh systemd.run_success_action=reboot systemd.unit=kernel-command-line.target" 
+else
+	echo no init and firstrun
+	setenv bootargs "console=ttyS0,115200 console=tty1 8250.nr_uarts=1 root=${root_part} rootwait ro" 
+fi;
+echo kernel addr is ${kernel_addr_r}
+echo fdt addr is ${fdt_addr}
+bootefi ${kernel_addr_r} - ${fdt_addr}
