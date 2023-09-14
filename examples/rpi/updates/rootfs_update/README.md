@@ -13,7 +13,7 @@ new image, updater and rootfs_update.sh scripts
 Upload the file rootfs_update.tar.gz in the "Update Firmware" section of the Bytebeam
 cloud. Once the OTA update is triggered, the file rootfs_update.tar.gz is downloaded to
 the device and its contents are extracted. Then updater script is run, which inturn
-calls rootfs_update.sh with appropriate parameters. Note that update.sh is like a wrapper
+calls rootfs_update.sh with appropriate parameters. Note that updater is like a wrapper
 script to rootfs_update.sh 
 
 ## Working of rootfs_update.sh scripts
