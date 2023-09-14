@@ -50,6 +50,8 @@ systemctl daemon-reload
 systemctl enable check-root-partition.service
 systemctl start check-root-partition.service
 
-touch /boot/two
+# Check if boot part is mounted at /boot or /uboot 
+BOOT=`df -h | grep "boot\|uboot" | awk '{print $NF}'`
+touch $BOOT/two
 touch /mnt/download/two
 echo "Done!!! Place device.json in /mnt/download folder"
