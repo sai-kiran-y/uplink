@@ -1,8 +1,10 @@
 # Rootfs Update
 
 This is used in situations, where one needs to update the entire system, including the
-rootfs, kernel and firmware files. A typical way of doing this would be to take the
+rootfs and kernel.  A typical way of doing this would be to take the
 tar of the updater, rootfs_update.sh script and image that you want the system to be updated to. 
+With the help of (this)[https://github.com/bytebeamio/uplink/blob/main/scripts/create-beaglebone-img.sh] script,
+tar of the rootfs can be created.
 
 ## Create the rootfs update tar file
 The script make_firmware_update.sh creates the tar file rootfs_update.tar.gz from the 
