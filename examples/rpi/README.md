@@ -2,7 +2,7 @@
 
 ## Setting up Raspberry Pi
 In order to get started with the Over-the-air(OTA) updates on RaspberryPi using Bytebeam Cloud, 
-an initial setup needs to be done. Download the bytebeam-rpi image, from this link and flash 
+an initial setup needs to be done. Download the bytebeam-rpi image, from [this](drive.google.com/file/d/1fdH88IS-wuUvqT6SPsIt7Vmy3tzezECW/view?usp=sharing) link and flash 
 the image on the SD Card, using tools like rpi-imager. It is recommended to use rpi-imager to 
 flash the image, instead of using dd command(on Linux). Wifi credentials can be set during this 
 stage itself. Once the flashing is complete, insert the SD Card into the Pi and power on the Pi.
