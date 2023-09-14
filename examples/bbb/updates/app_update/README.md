@@ -4,7 +4,7 @@ App update basically replaces the existing binary on the system with the
 binary uploaded on the Bytebeam cloud. In this example, the app is expected to be part of systemd. 
 The app basically prints the string "Hello from Bytebeam" every 3 seconds.
 [app_update.sh](app_update.sh) has the logic of replacing the old app, with the new one.
-By default the app is assumed to be in the folder /usr/local/bin. This is configurable in update.sh script.
+By default the app is assumed to be in the folder /usr/local/bin. This is configurable in updater script.
 
 ## updater
 [updater](updater) is the wrapper script for app_update script. Using updater, 
