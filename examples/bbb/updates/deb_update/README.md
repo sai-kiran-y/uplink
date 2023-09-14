@@ -1,8 +1,8 @@
 # Deb update
 
-If you have a deb package to be installed on the device(Raspberry Pi in this case),
+If you have a deb package to be installed on the device(Beaglebone Black in this case),
 then deb_update is the right way do it. In this example, we try to install the apt-src deb 
-package on the Raspberry Pi. [deb_update.sh](deb_update.sh) script has the logic of 
+package on Beaglebone. [deb_update.sh](deb_update.sh) script has the logic of 
 installing a deb package.
 
 ## updater
