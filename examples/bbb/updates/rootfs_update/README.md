@@ -25,5 +25,3 @@ firmware files and new kernel respectively and reboots.
 ## Status of the update
 The progress of the update can be seen in the Bytebeam cloud. If the 
 firmware files and the kernel are proper, the system is rebooted to the new kernel.
-There is no rollback feature for the kernel updates. So, care must be taken to ensure
-that the image provided in the kernel update is proper and something the device can boot from.
