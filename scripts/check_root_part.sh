@@ -10,13 +10,14 @@ else
 	action_id=0
 fi
 
-TWO_OK=/boot/two_ok
-TWO_BOOT=/boot/two
-TWO_FAILED=/boot/two_failed
+BOOT=`df -h | grep "boot\|uboot" | awk '{print $NF}'`
+TWO_OK=$BOOT/two_ok
+TWO_BOOT=$BOOT/two
+TWO_FAILED=$BOOT/two_failed
 TWO_DOWNLOAD=/mnt/download/two
-THREE_OK=/boot/three_ok
-THREE_BOOT=/boot/three
-THREE_FAILED=/boot/three_failed
+THREE_OK=$BOOT/three_ok
+THREE_BOOT=$BOOT/three
+THREE_FAILED=$BOOT/three_failed
 THREE_DOWNLOAD=/mnt/download/three
 
 if [ -f $TWO_FAILED ]
