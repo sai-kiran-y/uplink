@@ -50,7 +50,7 @@ echo next_root_uuid=$next_root_uuid
 echo download_uuid=$download_uuid
 
 # Remove the old entries of fstab, of next_root
-egrep -v "($root_uuid|$download_uuid|$next_root_uuid)" /etc/fstab > /mnt/next_root/etc/_fstab && mv /mnt/next_root/etc/_fstab /mnt/next_root/etc/fstab
+egrep -v "($root_uuid|$download_uuid|$next_root_uuid|$root_part|$next_root|$download_part)" /etc/fstab > /mnt/next_root/etc/_fstab && mv /mnt/next_root/etc/_fstab /mnt/next_root/etc/fstab
 
 # Update the fstab of next_root
 echo "PARTUUID=$next_root_uuid	/	ext4	defaults,noatime	0	1" >> /mnt/next_root/etc/fstab
