@@ -37,6 +37,7 @@ curl --proto '=https' --tlsv1.2 -sSf -o /mnt/download/reboot.sh https://raw.gith
 curl --proto '=https' --tlsv1.2 -sSf -o /mnt/download/check_root_part.sh https://raw.githubusercontent.com/sai-kiran-y/uplink/test-rpi/scripts/check_root_part.sh
 
 # Install netcat and vim
+sudo apt update 
 sudo apt install vim -y
 sudo apt install netcat -y
 
