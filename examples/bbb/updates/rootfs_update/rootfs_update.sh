@@ -53,11 +53,11 @@ echo download_uuid=$download_uuid
 egrep -v "($root_uuid|$download_uuid|$next_root_uuid|$root_part|$next_root|$download_part)" /etc/fstab > /mnt/next_root/etc/_fstab && mv /mnt/next_root/etc/_fstab /mnt/next_root/etc/fstab
 
 # Update the fstab of next_root
-echo "PARTUUID=$next_root_uuid	/	ext4	defaults,noatime	0	1" >> /mnt/next_root/etc/fstab
+echo "$next_root	/	ext4	defaults,noatime	0	1" >> /mnt/next_root/etc/fstab
 mkdir -pv /mnt/next_root
-echo "PARTUUID=$root_uuid	/mnt/next_root	ext4	defaults,noatime	0	2" >> /mnt/next_root/etc/fstab
+echo "$root_part	/mnt/next_root	ext4	defaults,noatime	0	2" >> /mnt/next_root/etc/fstab
 mkdir -pv /mnt/download
-echo "PARTUUID=$download_uuid	/mnt/download	ext4	defaults,noatime	0	2" >> /mnt/next_root/etc/fstab
+echo "$download_part	/mnt/download	ext4	defaults,noatime	0	2" >> /mnt/next_root/etc/fstab
 echo "{ \"stream\": \"action_status\", \"sequence\": 0, \"timestamp\": $(date +%s%3N), \"action_id\": \"$1\", \"state\": \"Completed\", \"progress\": 40, \"errors\": [] }" >&"${COPROC[1]}"
 
 ## Step 3: Add uplink and other scripts to systemd
