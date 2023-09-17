@@ -12,7 +12,15 @@ cp update_fstab.sh /mnt/download/
 curl --proto '=https' --tlsv1.2 -sSf -o /mnt/download/update_fstab_next_root.sh https://raw.githubusercontent.com/sai-kiran-y/uplink/test-rpi/scripts/update_fstab_next_root.sh
 
 # get uplink binary
-curl --proto '=https' --tlsv1.2 -sSfL -o /usr/local/share/bytebeam/uplink https://github.com/bytebeamio/uplink/releases/download/v2.5.0/uplink-aarch64-unknown-linux-gnu
+if [ `cat /etc/hostname` == "beaglebone" ];
+then
+	curl --proto '=https' --tlsv1.2 -sSfL -o /usr/local/share/bytebeam/uplink https://github.com/bytebeamio/uplink/releases/download/v2.7.1/uplink-armv7-unknown-linux-gnueabihf
+fi
+	
+if [ `cat /etc/hostname` == "raspberrypi" ];
+then
+	curl --proto '=https' --tlsv1.2 -sSfL -o /usr/local/share/bytebeam/uplink https://github.com/bytebeamio/uplink/releases/download/v2.7.1/uplink-aarch64-unknown-linux-gnu
+fi
 
 # get systemd script
 mkdir -pv /mnt/download/systemd
