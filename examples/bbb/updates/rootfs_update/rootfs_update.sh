@@ -3,13 +3,12 @@
 ## Steps:
 #			1. Extract the rootfs to new partition
 #			2. Update the fstab
-#			3. Copy WiFi config. files to new rootfs
-#			4. Add uplink and startup scripts to systemd
-#			5. Reboot the system
+#			3. Add uplink and startup scripts to systemd
+#			4. Reboot the system
 
 # COPROC[1] is the stdin for netcat
 # COPROC[0] is the stdout of netcat
-# By echoing to the stdin of nc, we write to the port 5050
+# By echoing to the stdin of nc, we write to the port 5555
 
 PORT=$2
 coproc nc localhost $PORT 
@@ -61,11 +60,7 @@ mkdir -pv /mnt/download
 echo "PARTUUID=$download_uuid	/mnt/download	ext4	defaults,noatime	0	2" >> /mnt/next_root/etc/fstab
 echo "{ \"stream\": \"action_status\", \"sequence\": 0, \"timestamp\": $(date +%s%3N), \"action_id\": \"$1\", \"state\": \"Completed\", \"progress\": 40, \"errors\": [] }" >&"${COPROC[1]}"
 
-## Step 3: Copying WiFi config. files to the next rootfs
-cp /etc/wpa_supplicant/wpa_supplicant.conf /mnt/next_root/etc/wpa_supplicant/
-echo "{ \"stream\": \"action_status\", \"sequence\": 0, \"timestamp\": $(date +%s%3N), \"action_id\": \"$1\", \"state\": \"Completed\", \"progress\": 50, \"errors\": [] }" >&"${COPROC[1]}"
-
-## Step 4: Add uplink and other scripts to systemd
+## Step 3: Add uplink and other scripts to systemd
 # Add uplink to systemd
 cp /mnt/download/systemd/uplink.service /mnt/next_root/etc/systemd/system/
 if [ -f /mnt/next_root/etc/systemd/system/multi-user.target.wants/uplink.service ]
@@ -100,11 +95,11 @@ fi
 ## Step 4: Reboot the system
 # Before rebooting, some flags are created in data partition
 # to know if reboot is due to rootfs issue or if it's a normal reboot.
-TWO_OK=/boot/two_ok
-TWO_BOOT=/boot/two
+TWO_OK=/uboot/two_ok
+TWO_BOOT=/uboot/two
 TWO_DOWNLOAD=/mnt/download/two
-THREE_OK=/boot/three_ok
-THREE_BOOT=/boot/three
+THREE_OK=/uboot/three_ok
+THREE_BOOT=/uboot/three
 THREE_DOWNLOAD=/mnt/download/three
 
 root_part=`awk -F"root=" '{ print $NF; }' /proc/cmdline | cut -d" " -f1`
@@ -144,24 +139,6 @@ then
 fi
 
 echo "{ \"stream\": \"action_status\", \"sequence\": 0, \"timestamp\": $(date +%s%3N), \"action_id\": \"$1\", \"state\": \"Completed\", \"progress\": 90, \"errors\": [] }" >&"${COPROC[1]}"
-
-cp /boot/u-boot.bin /mnt/download
-cp /boot/boot.scr /mnt/download
-
-# Delete flags in boot folder of next rootfs
-files=( two two_ok three three_ok )
-for i in "${files[@]}"
-do
-	echo "$i"
-	rm -rf /mnt/next_root/boot/$i
-done
-
-# Copy the kernel and firmware files to boot partition
-cp -r /mnt/next_root/boot/* /boot/
-
-# Place uboot script in boot partition
-cp /mnt/download/boot.scr /boot/
-cp /mnt/download/u-boot.bin /boot/
 
 # If the boot is successful, startup script sends progress as 100.
 sudo reboot
