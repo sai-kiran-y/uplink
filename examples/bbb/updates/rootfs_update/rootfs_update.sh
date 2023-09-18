@@ -17,8 +17,8 @@ action_id=$1
 echo $action_id > /mnt/download/action_id
 
 ## Step 1: Extracting the rootfs
-rm -rf /mnt/next_root/*
-tar -xvpzf $3/*.tar.gz -C /mnt/next_root/
+#rm -rf /mnt/next_root/*
+#tar -xvpzf $3/*.tar.gz -C /mnt/next_root/
 echo "{ \"stream\": \"action_status\", \"sequence\": 0, \"timestamp\": $(date +%s%3N), \"action_id\": \"$1\", \"state\": \"Completed\", \"progress\": 20, \"errors\": [] }" >&"${COPROC[1]}"
 
 ## Step 2: Update the fstab of extracted rootfs
@@ -141,4 +141,5 @@ fi
 echo "{ \"stream\": \"action_status\", \"sequence\": 0, \"timestamp\": $(date +%s%3N), \"action_id\": \"$1\", \"state\": \"Completed\", \"progress\": 90, \"errors\": [] }" >&"${COPROC[1]}"
 
 # If the boot is successful, startup script sends progress as 100.
+sudo systemctl stop uplink
 sudo reboot
