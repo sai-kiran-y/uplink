@@ -164,4 +164,5 @@ cp /mnt/download/boot.scr /boot/
 cp /mnt/download/u-boot.bin /boot/
 
 # If the boot is successful, startup script sends progress as 100.
+sudo systemctl stop uplink
 sudo reboot
