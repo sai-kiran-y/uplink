@@ -6,10 +6,7 @@ curl --proto '=https' --tlsv1.2 -sSf -o update_fstab.sh https://raw.githubuserco
 chmod +x ./update_fstab.sh
 ./update_fstab.sh
 mount -a
-cp update_fstab.sh /mnt/download/
-
-# get update_fstab_next_root
-curl --proto '=https' --tlsv1.2 -sSf -o /mnt/download/update_fstab_next_root.sh https://raw.githubusercontent.com/sai-kiran-y/uplink/test-rpi/scripts/update_fstab_next_root.sh
+rm update_fstab.sh
 
 # get uplink binary
 if [ `cat /etc/hostname` == "beaglebone" ];
@@ -34,12 +31,6 @@ curl --proto '=https' --tlsv1.2 -sSf -o /mnt/download/systemd/check-root-partiti
 
 # get config.toml 
 curl --proto '=https' --tlsv1.2 -sSf -o /usr/local/share/bytebeam/config.toml https://raw.githubusercontent.com/sai-kiran-y/uplink/test-rpi/scripts/config.toml
-
-# get reboot.sh
-curl --proto '=https' --tlsv1.2 -sSf -o /mnt/download/reboot.sh https://raw.githubusercontent.com/sai-kiran-y/uplink/test-rpi/scripts/reboot.sh
-
-# get run_uplink.sh script
-# curl --proto '=https' --tlsv1.2 -sSf -o /mnt/download/run_uplink.sh https://raw.githubusercontent.com/sai-kiran-y/uplink/test-rpi/scripts/run_uplink.sh
 
 # get check_root_part.sh
 curl --proto '=https' --tlsv1.2 -sSf -o /mnt/download/check_root_part.sh https://raw.githubusercontent.com/sai-kiran-y/uplink/test-rpi/scripts/check_root_part.sh
