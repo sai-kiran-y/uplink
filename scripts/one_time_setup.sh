@@ -19,10 +19,6 @@ then
 	curl --proto '=https' --tlsv1.2 -sSfL -o /usr/local/share/bytebeam/uplink https://github.com/bytebeamio/uplink/releases/download/v2.7.1/uplink-aarch64-unknown-linux-gnu
 fi
 
-# get systemd script
-mkdir -pv /mnt/download/systemd
-curl --proto '=https' --tlsv1.2 -sSf -o /mnt/download/systemd/systemd.sh https://raw.githubusercontent.com/sai-kiran-y/uplink/test-rpi/scripts/systemd/systemd.sh
-
 # get uplink.service
 curl --proto '=https' --tlsv1.2 -sSf -o /mnt/download/systemd/uplink.service https://raw.githubusercontent.com/sai-kiran-y/uplink/test-rpi/scripts/systemd/uplink.service
 
